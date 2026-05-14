@@ -155,4 +155,34 @@
             <version>6.1.0</version>
         </dependency>
     </dependencies>
+    <repositories>
+        <repository>
+            <id>jboss-public</id>
+            <name>JBoss Public Repository</name>
+            <url>https://repository.jboss.org/nexus/repository/public/</url>
+        </repository>
+        <repository>                 <!-- todo add mead repo -->
+            <id>jboss-qa-releases</id>
+            <name>JBoss QA Release Repository</name>
+            <url>https://repository.engineering.redhat.com/nexus/content/repositories/jboss-qa-releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jboss-snapshots</id>
+            <url>https://repository.jboss.org/nexus/content/repositories/snapshots</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>
