@@ -11,11 +11,12 @@ if [ -d "/opt/app-root/src/etc-pki-tls" ]; then
         echo "Importing repo-ca.crt into custom Java truststore..."
         
         SYSTEM_CACERTS="/etc/pki/java/cacerts"
-        CUSTOM_CACERTS="/tmp/cacerts"
+        CUSTOM_CACERTS="/opt/app-root/src/cacerts"
         CERT_ALIAS="repo-ca"
         
         if [ -f "$SYSTEM_CACERTS" ]; then
             cp "$SYSTEM_CACERTS" "$CUSTOM_CACERTS"
+            chmod 644 "$CUSTOM_CACERTS"
             
             keytool -import -noprompt -trustcacerts \
                 -alias "$CERT_ALIAS" \
