@@ -8,20 +8,27 @@ if [ -d "/opt/app-root/src/etc-pki-tls" ]; then
     echo "Found CA certificates in /opt/app-root/src/etc-pki-tls"
     
     if [ -f "/opt/app-root/src/etc-pki-tls/repo-ca.crt" ]; then
-        echo "Importing repo-ca.crt into Java truststore..."
+        echo "Importing repo-ca.crt into custom Java truststore..."
         
-        JAVA_CACERTS="/etc/pki/java/cacerts"
+        SYSTEM_CACERTS="/etc/pki/java/cacerts"
+        CUSTOM_CACERTS="/tmp/cacerts"
         CERT_ALIAS="repo-ca"
         
-        if [ -f "$JAVA_CACERTS" ]; then
+        if [ -f "$SYSTEM_CACERTS" ]; then
+            cp "$SYSTEM_CACERTS" "$CUSTOM_CACERTS"
+            
             keytool -import -noprompt -trustcacerts \
                 -alias "$CERT_ALIAS" \
                 -file "/opt/app-root/src/etc-pki-tls/repo-ca.crt" \
-                -keystore "$JAVA_CACERTS" \
-                -storepass changeit 2>/dev/null || echo "Certificate may already be imported or import failed"
-            echo "Certificate import completed"
+                -keystore "$CUSTOM_CACERTS" \
+                -storepass changeit
+            
+            echo "Certificate imported successfully"
+            
+            export MAVEN_OPTS="${MAVEN_OPTS} -Djavax.net.ssl.trustStore=$CUSTOM_CACERTS -Djavax.net.ssl.trustStorePassword=changeit"
+            echo "MAVEN_OPTS updated to use custom truststore: $MAVEN_OPTS"
         else
-            echo "Warning: Java cacerts not found at $JAVA_CACERTS"
+            echo "Warning: System cacerts not found at $SYSTEM_CACERTS"
         fi
     else
         echo "No repo-ca.crt found"
