@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -e
+
+echo "Custom assemble script: Importing custom CA certificates..."
+
+if [ -d "/opt/app-root/src/etc-pki-tls" ]; then
+    echo "Found CA certificates in /opt/app-root/src/etc-pki-tls"
+    
+    if [ -f "/opt/app-root/src/etc-pki-tls/repo-ca.crt" ]; then
+        echo "Importing repo-ca.crt into Java truststore..."
+        
+        JAVA_CACERTS="/etc/pki/java/cacerts"
+        CERT_ALIAS="repo-ca"
+        
+        if [ -f "$JAVA_CACERTS" ]; then
+            keytool -import -noprompt -trustcacerts \
+                -alias "$CERT_ALIAS" \
+                -file "/opt/app-root/src/etc-pki-tls/repo-ca.crt" \
+                -keystore "$JAVA_CACERTS" \
+                -storepass changeit 2>/dev/null || echo "Certificate may already be imported or import failed"
+            echo "Certificate import completed"
+        else
+            echo "Warning: Java cacerts not found at $JAVA_CACERTS"
+        fi
+    else
+        echo "No repo-ca.crt found"
+    fi
+else
+    echo "No custom CA certificates directory found, skipping certificate import"
+fi
+
+echo "Calling default S2I assemble script..."
+exec /usr/libexec/s2i/assemble
